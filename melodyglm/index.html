@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Hugo 0.16-DEV" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/github.min.css">
+  <link rel="stylesheet" href="../css/normalize.css">
+  <link rel="stylesheet" href="../css/skeleton.css">
+  <link rel="stylesheet" href="../css/custom.css">
+  <link rel="shortcut icon" href="favicon.png" type="image/x-icon" />
+  <title>MelodyGLM: Large-Scale Pre-training with Multi-Scale, Multi-Dimension Blank Infilling for Symbolic Melody
+    Generation</title>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <header role="banner">
+
+    </header>
+
+
+    <main role="main">
+      <article itemscope itemtype="https://schema.org/BlogPosting">
+        <h1 class="entry-title" itemprop="headline">MelodyGLM: Multi-task Pre-training for Symbolic Melody Generation
+        </h1>
+
+        <section itemprop="entry-text">
+          
+          <h2 id="abstract">Abstract</h2>
+          <div style="text-align:left">
+
+            <p>Pre-trained language models have achieved impressive results in various music understanding and
+              generation
+              tasks. However, existing pre-training methods for symbolic melody generation struggle to capture
+              multi-scale, multi-dimensional structural information in note sequences, due to the domain knowledge
+              discrepancy between text and music. Moreover, the lack of available large-scale symbolic melody datasets
+              limits the pre-training improvement. In this paper, we propose MelodyGLM, a multi-task pre-training
+              framework for generating melodies with long-term structure. We design the melodic n-gram and long span
+              sampling strategies to create local and global blank infilling tasks for modeling the local and global
+              structures in melodies. Specifically, we incorporate pitch n-grams, rhythm n-grams, and their combined
+              n-grams into the melodic n-gram blank infilling tasks for modeling the multi-dimensional structures in
+              melodies. To this end, we have constructed a large-scale symbolic melody dataset, MelodyNet, containing
+              more
+              than 0.4 million melody pieces. MelodyNet is utilized for large-scale pre-training and domain-specific
+              n-gram lexicon construction. Both subjective and objective evaluations demonstrate that MelodyGLM
+              surpasses
+              the standard and previous pre-training methods. In particular, subjective evaluations show that, on the
+              melody continuation task, MelodyGLM gains average improvements by 0.82, 0.87, 0.78, and 0.94 in
+              consistency,
+              rhythmicity, structure, and overall quality, respectively. Notably, MelodyGLM nearly matches the quality
+              of
+              human-composed melodies on the melody inpainting task.</p>
+
+            <br>
+
+            <h><b>MelodyGLM Overview</b></h>
+            <br>
+            <img src="../image/melodyglm/fig2_melodyglm.jpg">
+          </div>
+
+          <h2 id="datasets">MelodyNet (Continuous Updating)</h2>
+
+          <div style="text-align:left">
+            <h><b>Data Processing Procedure</b></h>
+            <br>
+            <img src="../image/melodyglm/fig1_melodyglm.png">
+          </div>
+
+          <br>
+
+          <table>
+            <tbody>
+              <tr>
+                <td style="width: 150px"><b>Public Corpus</b></td>
+                <td style="width: 550px"><b>Website</b></td>
+                <td><b>Download</b></td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left">
+                  NES
+                </td>
+                <td style="text-align: left">
+                  <a href="https://www.kaggle.com/datasets/imsparsh/nes-mdb-dataset"
+                    target="_blank">https://www.kaggle.com/datasets/imsparsh/nes-mdb-dataset</a>
+                  <br>
+                  <a href="https://github.com/chrisdonahue/nesmdb"
+                    target="_blank">https://github.com/chrisdonahue/nesmdb</a>
+                </td>
+                <td style="text-align: center">
+                  <a href="../data/melodyglm/nes.zip" download>
+                    <img src="../image/melodyglm/download.svg" alt="可点击下载的图片" style="width: 25px;height: 25px;">
+                  </a>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left">
+                  POP909
+                </td>
+                <td style="text-align: left">
+                  <a href="https://github.com/music-x-lab/POP909-Dataset"
+                    target="_blank">https://github.com/music-x-lab/POP909-Dataset</a>
+                </td>
+                <td style="text-align: center">
+                  <a href="../data/melodyglm/pop909.zip" download>
+                    <img src="../image/melodyglm/download.svg" alt="可点击下载的图片" style="width: 25px;height: 25px;">
+                  </a>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left">
+                  MTCL
+                </td>
+                <td style="text-align: left">
+                  <a href="https://www.liederenbank.nl/mtc" target="_blank">https://www.liederenbank.nl/mtc</a>
+                </td>
+                <td style="text-align: center">
+                  <a href="../data/melodyglm/mtc.zip" download>
+                    <img src="../image/melodyglm/download.svg" alt="可点击下载的图片" style="width: 25px;height: 25px;">
+                  </a>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left">
+                  Wikifonia
+                </td>
+                <td style="text-align: left">
+                  <a href="http://www.wikifonia.org/" target="_blank">http://www.wikifonia.org</a>
+                  <br>
+                  <a href="http://www.synthzone.com/files/Wikifonia/Wikifonia.zip"
+                    target="_blank">http://www.synthzone.com/files/Wikifonia/Wikifonia.zip</a>
+                </td>
+                <td style="text-align: center">
+                  <a href="../data/melodyglm/wikifonia.zip" download>
+                    <img src="../image/melodyglm/download.svg" alt="可点击下载的图片" style="width: 25px;height: 25px;">
+                  </a>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left">
+                  Session
+                </td>
+                <td style="text-align: left">
+                  <a href="https://thesession.org/" target="_blank">https://thesession.org</a>
+                </td>
+                <td style="text-align: center">
+                  <a href="../data/melodyglm/sessions.zip" download>
+                    <img src="../image/melodyglm/download.svg" alt="可点击下载的图片" style="width: 25px;height: 25px;">
+                  </a>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left">
+                  LMD
+                </td>
+                <td style="text-align: left">
+                  <a href="https://colinraffel.com/projects/lmd/"
+                    target="_blank">https://colinraffel.com/projects/lmd</a>
+                </td>
+                <td style="text-align: center">
+                  <a href="../data/melodyglm/lmd_full.zip" download>
+                    <img src="../image/melodyglm/download.svg" alt="可点击下载的图片" style="width: 25px;height: 25px;">
+                  </a>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left">
+                  SymphonyNet
+                </td>
+                <td style="text-align: left">
+                  <a href="https://symphonynet.github.io/" target="_blank">https://symphonynet.github.io</a>
+                </td>
+                <td style="text-align: center">
+                  <a href="../data/melodyglm/symphonynet.zip" download>
+                    <img src="../image/melodyglm/download.svg" alt="可点击下载的图片" style="width: 25px;height: 25px;">
+                  </a>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left">
+                  MetaMIDI
+                </td>
+                <td style="text-align: left">
+                  <a href="https://zenodo.org/record/5142664" target="_blank">https://zenodo.org/record/5142664</a>
+                </td>
+                <td style="text-align: center">
+                  <img src="../image/melodyglm/not_available.svg" alt="可点击下载的图片" style="width: 25px;height: 25px;">
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+
+          <br>
+
+          <table>
+            <tbody>
+              <tr>
+                <td style="width: 150px"><b>Web Collections</b></td>
+                <td style="width: 550px"><b>Website</b></td>
+                <td><b>Download</b></td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left">
+                  MuseScore
+                </td>
+                <td style="text-align: left">
+                  <a href="https://musescore.org" target="_blank">https://musescore.org</a>
+                  <br>
+                  <a href="https://github.com/Xmader/musescore-dataset"
+                    target="_blank">https://github.com/Xmader/musescore-dataset</a>
+                </td>
+                <td style="text-align: center">
+                  <img src="../image/melodyglm/not_available.svg" alt="可点击下载的图片" style="width: 25px;height: 25px;">
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left">
+                  Hooktheory
+                </td>
+                <td style="text-align: left">
+                  <a href="https://www.hooktheory.com" target="_blank">https://www.hooktheory.com</a>
+                  <br>
+                  <a href="https://github.com/wayne391/lead-sheet-dataset"
+                    target="_blank">https://github.com/wayne391/lead-sheet-dataset</a>
+                </td>
+                <td style="text-align: center">
+                  <img src="../image/melodyglm/not_available.svg" alt="可点击下载的图片" style="width: 25px;height: 25px;">
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left">
+                  BitMidi
+                </td>
+                <td style="text-align: left">
+                  <a href="https://bitmidi.com" target="_blank">https://bitmidi.com</a>
+                </td>
+                <td style="text-align: center">
+                  <img src="../image/melodyglm/not_available.svg" alt="可点击下载的图片" style="width: 25px;height: 25px;">
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left">
+                  FreeMidi
+                </td>
+                <td style="text-align: left">
+                  <a href="https://freemidi.org" target="_blank">https://freemidi.org</a>
+                  <br>
+                  <a href="https://github.com/josephding23/Free-Midi-Library"
+                    target="_blank">https://github.com/josephding23/Free-Midi-Library</a>
+                </td>
+                <td style="text-align: center">
+                  <img src="../image/melodyglm/not_available.svg" alt="可点击下载的图片" style="width: 25px;height: 25px;">
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left">
+                  KernScores
+                </td>
+                <td style="text-align: left">
+                  <a href="http://kern.ccarh.org" target="_blank">http://kern.ccarh.org</a>
+                </td>
+                <td style="text-align: center">
+                  <img src="../image/melodyglm/not_available.svg" alt="可点击下载的图片" style="width: 25px;height: 25px;">
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left">
+                  Kunstderfuge
+                </td>
+                <td style="text-align: left">
+                  <a href="https://www.kunstderfuge.com" target="_blank">https://www.kunstderfuge.com</a>
+                </td>
+                <td style="text-align: center">
+                  <img src="../image/melodyglm/not_available.svg" alt="可点击下载的图片" style="width: 25px;height: 25px;">
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left">
+                  ABC Notation
+                </td>
+                <td style="text-align: left">
+                  <a href="https://abcnotation.com" target="_blank">https://abcnotation.com</a>
+                </td>
+                <td style="text-align: center">
+                  <img src="../image/melodyglm/not_available.svg" alt="可点击下载的图片" style="width: 25px;height: 25px;">
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+
+          <h2 id="melodyglm-samples">MelodyGLM Samples</h2>
+
+          <table>
+            <tbody>
+              <tr>
+                <td style="text-align: left"><b>Melody Continuation</b></td>
+                <td style="text-align: center"></td>
+                <td style="text-align: left"><b>Melody Inpainting</b></td>
+                <td style="text-align: center"></td>
+              </tr>
+
+              <tr>
+                <td>
+                  <audio controls="controls">
+                    <source src="../audio/melodyglm/clm/audio/melodyglm_1.mp3" autoplay />Your browser does not support
+                    the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/clm/midi/melodyglm_1.mid" style="margin-right: 50px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls">
+                    <source src="../audio/melodyglm/infilling/audio/melodyglm_1.mp3" autoplay />Your browser does not
+                    support the audio element.
+                  </audio>
+                </td>
+                <td>
+                  <a href="../audio/melodyglm/infilling/midi/melodyglm_1.mid">midi</a>
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                  <audio controls="controls">
+                    <source src="../audio/melodyglm/clm/audio/melodyglm_2.mp3" autoplay />Your browser does not support
+                    the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/clm/midi/melodyglm_2.mid" style="margin-right: 50px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls">
+                    <source src="../audio/melodyglm/infilling/audio/melodyglm_2.mp3" autoplay />Your browser does not
+                    support the audio element.
+                  </audio>
+                </td>
+                <td>
+                  <a href="../audio/melodyglm/infilling/midi/melodyglm_2.mid">midi</a>
+                </td>
+              </tr>
+
+              <tr>
+                <td>
+                  <audio controls="controls">
+                    <source src="../audio/melodyglm/clm/audio/melodyglm_3.mp3" autoplay />Your browser does not support
+                    the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/clm/midi/melodyglm_3.mid" style="margin-right: 50px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls">
+                    <source src="../audio/melodyglm/infilling/audio/melodyglm_3.mp3" autoplay />Your browser does not
+                    support the audio element.
+                  </audio>
+                </td>
+                <td>
+                  <a href="../audio/melodyglm/infilling/midi/melodyglm_3.mid">midi</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+
+          <h2 id="baseline">Baseline Models</h2>
+
+          <table>
+            <tbody>
+              <b>Melody Continuation</b>
+              <tr>
+                <td style="text-align: center; width: 150px;"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left;">Scratch</td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/clm/audio/scratch_1.mp3" autoplay />Your browser does not support
+                    the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/clm/midi/scratch_1.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/clm/audio/scratch_2.mp3" autoplay />Your browser does not support
+                    the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/clm/midi/scratch_2.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/clm/audio/scratch_3.mp3" autoplay />Your browser does not support
+                    the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/clm/midi/scratch_3.mid">midi</a>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left;">SLM</td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/clm/audio/SLM_1.mp3" autoplay />Your browser does not support the
+                    audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/clm/midi/SLM_1.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/clm/audio/SLM_2.mp3" autoplay />Your browser does not support the
+                    audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/clm/midi/SLM_2.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/clm/audio/SLM_3.mp3" autoplay />Your browser does not support the
+                    audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/clm/midi/SLM_3.mid">midi</a>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left;">Span</td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/clm/audio/span_1.mp3" autoplay />Your browser does not support the
+                    audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/clm/midi/span_1.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/clm/audio/span_2.mp3" autoplay />Your browser does not support the
+                    audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/clm/midi/span_2.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/clm/audio/span_3.mp3" autoplay />Your browser does not support the
+                    audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/clm/midi/span_3.mid">midi</a>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left;">Bar</td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/clm/audio/bar_1.mp3" autoplay />Your browser does not support the
+                    audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/clm/midi/bar_1.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/clm/audio/bar_2.mp3" autoplay />Your browser does not support the
+                    audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/clm/midi/bar_2.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/clm/audio/bar_3.mp3" autoplay />Your browser does not support the
+                    audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/clm/midi/bar_3.mid">midi</a>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left;">Long</td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/clm/audio/long_1.mp3" autoplay />Your browser does not support the
+                    audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/clm/midi/long_1.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/clm/audio/long_2.mp3" autoplay />Your browser does not support the
+                    audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/clm/midi/long_2.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/clm/audio/long_3.mp3" autoplay />Your browser does not support the
+                    audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/clm/midi/long_3.mid">midi</a>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left;">Musical N-gram</td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/clm/audio/Musical_N-gram_1.mp3" autoplay />Your browser does not
+                    support
+                    the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/clm/midi/Musical_N-gram_1.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/clm/audio/Musical_N-gram_2.mp3" autoplay />Your browser does not
+                    support
+                    the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/clm/midi/Musical_N-gram_2.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/clm/audio/Musical_N-gram_3.mp3" autoplay />Your browser does not
+                    support
+                    the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/clm/midi/Musical_N-gram_3.mid">midi</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <br>
+          <table>
+            <tbody>
+              <b>Melody Inpainting</b>
+              <tr>
+                <td style="text-align: center; width: 150px;"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left;">Scratch</td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/infilling/audio/scratch_1.mp3" autoplay />Your browser does not
+                    support the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/infilling/midi/scratch_1.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/infilling/audio/scratch_2.mp3" autoplay />Your browser does not
+                    support the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/infilling/midi/scratch_2.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/infilling/audio/scratch_3.mp3" autoplay />Your browser does not
+                    support the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/infilling/midi/scratch_3.mid">midi</a>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left;">SLM</td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/infilling/audio/SLM_1.mp3" autoplay />Your browser does not support
+                    the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/infilling/midi/SLM_1.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/infilling/audio/SLM_2.mp3" autoplay />Your browser does not support
+                    the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/infilling/midi/SLM_2.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/infilling/audio/SLM_3.mp3" autoplay />Your browser does not support
+                    the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/infilling/midi/SLM_3.mid">midi</a>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left;">Span</td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/infilling/audio/span_1.mp3" autoplay />Your browser does not support
+                    the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/infilling/midi/span_1.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/infilling/audio/span_2.mp3" autoplay />Your browser does not support
+                    the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/infilling/midi/span_2.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/infilling/audio/span_3.mp3" autoplay />Your browser does not support
+                    the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/infilling/midi/span_3.mid">midi</a>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left;">Bar</td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/infilling/audio/bar_1.mp3" autoplay />Your browser does not support
+                    the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/infilling/midi/bar_1.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/infilling/audio/bar_2.mp3" autoplay />Your browser does not support
+                    the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/infilling/midi/bar_2.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/infilling/audio/bar_3.mp3" autoplay />Your browser does not support
+                    the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/infilling/midi/bar_3.mid">midi</a>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left;">Long</td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/infilling/audio/long_1.mp3" autoplay />Your browser does not
+                    support the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/infilling/midi/long_1.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/infilling/audio/long_2.mp3" autoplay />Your browser does not
+                    support the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/infilling/midi/long_2.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/infilling/audio/long_3.mp3" autoplay />Your browser does not
+                    support the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/infilling/midi/long_3.mid">midi</a>
+                </td>
+              </tr>
+
+              <tr>
+                <td style="text-align: left;">Musical N-gram</td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/infilling/audio/Musical_N-gram_1.mp3" autoplay />Your browser does
+                    not
+                    support the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/infilling/midi/Musical_N-gram_1.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/infilling/audio/Musical_N-gram_2.mp3" autoplay />Your browser does
+                    not
+                    support the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/infilling/midi/Musical_N-gram_2.mid" style="margin-right: 25px;">midi</a>
+                </td>
+                <td>
+                  <audio controls="controls" style="width: 200px;">
+                    <source src="../audio/melodyglm/infilling/audio/Musical_N-gram_3.mp3" autoplay />Your browser does
+                    not
+                    support the audio element.
+                  </audio>
+                </td>
+                <td style="text-align: center">
+                  <a href="../audio/melodyglm/infilling/midi/Musical_N-gram_3.mid">midi</a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <script>
+            (function (i, s, o, g, r, a, m) {
+              i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+              }, i[r].l = 1 * new Date(); a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+            })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+            ga('create', 'UA-139981676-1', 'auto');
+            ga('send', 'pageview');
+          </script>
+
+          <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+          <script>hljs.initHighlightingOnLoad();</script>
+
+
+
+          <script type="text/x-mathjax-config">
+     MathJax.Hub.Config({
+         HTML: ["input/TeX","output/HTML-CSS"],
+         TeX: {
+                Macros: {
+                         bm: ["\\boldsymbol{#1}", 1],
+                         argmax: ["\\mathop{\\rm arg\\,max}\\limits"],
+                         argmin: ["\\mathop{\\rm arg\\,min}\\limits"]},
+                extensions: ["AMSmath.js","AMSsymbols.js"],
+                equationNumbers: { autoNumber: "AMS" } },
+         extensions: ["tex2jax.js"],
+         jax: ["input/TeX","output/HTML-CSS"],
+         tex2jax: { inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+                    displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+                    processEscapes: true },
+         "HTML-CSS": { availableFonts: ["TeX"],
+                       linebreaks: { automatic: true } }
+     });
+ </script>
+
+          <script type="text/x-mathjax-config">
+     MathJax.Hub.Config({
+       tex2jax: {
+         skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+       }
+     });
+ </script>
+
+          <script type="text/javascript" async
+            src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-MML-AM_CHTML">
+            </script>
+
+
+
+
+</body>
+
+</html>
